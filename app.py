@@ -148,13 +148,13 @@ def search_venues():
             "num_upcoming_shows": 0,
         }]
     }
-    row_search_term = request.form['search_term']
-    format_serch_term = "%{}%".format(row_search_term)
+    raw_search_term = request.form['search_term']
+    format_search_term = "%{}%".format(raw_search_term)
 
-    venues = Venue.query.filter(Venue.name.ilike(format_serch_term)).all()
-    rowNum = db.session.query(db.func.count(Venue.id)).filter(Venue.name.ilike(format_serch_term)).scalar()
+    venues = Venue.query.filter(Venue.name.ilike(format_search_term)).all()
+    rowNum = db.session.query(db.func.count(Venue.id)).filter(Venue.name.ilike(format_search_term)).scalar()
 
-    return render_template('pages/search_venues.html', results=venues, search_term=row_search_term, counter=rowNum)
+    return render_template('pages/search_venues.html', results=venues, search_term=raw_search_term, counter=rowNum)
 
 
 
@@ -332,7 +332,15 @@ def search_artists():
             "num_upcoming_shows": 0,
         }]
     }
-    return render_template('pages/search_artists.html', results=response, search_term=request.form.get('search_term', ''))
+
+    raw_search_term = request.form['search_term']
+    format_search_term = "%{}%".format(raw_search_term)
+
+    artists = db.session.query(Artist).filter(Artist.name.ilike(format_search_term)).all()
+    rowsNum = db.session.query(db.func.count(Artist.id)).filter(Artist.name.ilike(format_search_term)).scalar()
+
+    print(raw_search_term)
+    return render_template('pages/search_artists.html', results=artists, search_term=raw_search_term, counter=rowsNum)
 
 
 @app.route('/artists/<int:artist_id>')
