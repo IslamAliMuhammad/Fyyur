@@ -71,7 +71,7 @@ class Show(db.Model):
     __tablename__ = 'show'
 
     id = db.Column(db.Integer, primary_key=True)
-    datetime = db.Column(db.String())
+    start_time = db.Column(db.String())
 
     venue_id = db.Column(db.Integer, db.ForeignKey('venue.id'))
     artist_id = db.Column(db.Integer, db.ForeignKey('artist.id'))
@@ -107,7 +107,7 @@ def index():
 
 @app.route('/venues')
 def venues():
-    # TODO: replace with real venues data.
+    # done: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
     data = [{
         "city": "San Francisco",
@@ -130,7 +130,9 @@ def venues():
             "num_upcoming_shows": 0,
         }]
     }]
-    return render_template('pages/venues.html', areas=data)
+    venueAreasData = Venue.query.with_entities(Venue.id, Venue.name, Venue.city, Venue.state).all()
+
+    return render_template('pages/venues.html', areas=venueAreasData)
 
 
 @app.route('/venues/search', methods=['POST'])
@@ -293,7 +295,7 @@ def delete_venue(venue_id):
 #  ----------------------------------------------------------------
 @app.route('/artists')
 def artists():
-    # TODO: replace with real data returned from querying the database
+    # done: replace with real data returned from querying the database
     data = [{
         "id": 4,
         "name": "Guns N Petals",
@@ -304,7 +306,10 @@ def artists():
         "id": 6,
         "name": "The Wild Sax Band",
     }]
-    return render_template('pages/artists.html', artists=data)
+
+    artistsNameData = Artist.query.with_entities(Artist.id, Artist.name).all()
+
+    return render_template('pages/artists.html', artists=artistsNameData)
 
 
 @app.route('/artists/search', methods=['POST'])
@@ -507,7 +512,7 @@ def create_artist_submission():
 @app.route('/shows')
 def shows():
     # displays list of shows at /shows
-    # TODO: replace with real venues data.
+    # done: replace with real venues data.
     #       num_shows should be aggregated based on number of upcoming shows per venue.
     data = [{
         "venue_id": 1,
@@ -545,6 +550,19 @@ def shows():
         "artist_image_link": "https://images.unsplash.com/photo-1558369981-f9ca78462e61?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=794&q=80",
         "start_time": "2035-04-15T20:00:00.000Z"
     }]
+
+    shows = Show.query.all()
+    
+    data = []
+    for show in shows:
+        data.append({
+            'start_time' : show.start_time,
+            'venue_id' : show.venue_id,
+            'artist_id' : show.artist_id,
+            'venue_name': show.venue.name,
+            'artist_name': show.artist.name,
+            'artist_image_link': show.artist.image_link
+        })
     return render_template('pages/shows.html', shows=data)
 
 
@@ -561,12 +579,11 @@ def create_show_submission():
         # called to create new shows in the db, upon submitting new show listing form
         # done: insert form data as a new Show record in the db, instead
         showData = request.form
-
-        datetime = showData['start_time']
+        start_time = showData['start_time']
         artist_id = showData['artist_id']
         venue_id = showData['venue_id']
 
-        show = Show(datetime=datetime, artist_id=artist_id, venue_id=venue_id)
+        show = Show(start_time=start_time, artist_id=artist_id, venue_id=venue_id)
         db.session.add(show)
         db.session.commit()
         # on successful db insert, flash success
