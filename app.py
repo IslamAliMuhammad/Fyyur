@@ -161,7 +161,7 @@ def search_venues():
 @app.route('/venues/<int:venue_id>')
 def show_venue(venue_id):
     # shows the venue page with the given venue_id
-    # TODO: replace with real venue data from the venues table, using venue_id
+    # done: replace with real venue data from the venues table, using venue_id
     data1 = {
         "id": 1,
         "name": "The Musical Hop",
@@ -239,8 +239,11 @@ def show_venue(venue_id):
         "past_shows_count": 1,
         "upcoming_shows_count": 1,
     }
-    data = list(filter(lambda d: d['id'] ==
-                       venue_id, [data1, data2, data3]))[0]
+    
+    data = db.session.query(Venue).filter_by(id=venue_id).first()
+
+    # data = list(filter(lambda d: d['id'] ==
+    #                    venue_id, [data1, data2, data3]))[0]
     return render_template('pages/show_venue.html', venue=data)
 
 #  Create Venue
@@ -273,7 +276,7 @@ def create_venue_submission():
 
         db.session.add(venue)
         db.session.commit()
-        # TODO: modify data to be the data object returned from db insertion
+        # done: modify data to be the data object returned from db insertion
 
         # on successful db insert, flash success
         flash('Venue ' + name + ' was successfully listed!')
@@ -291,7 +294,7 @@ def create_venue_submission():
 
 @app.route('/venues/<venue_id>', methods=['DELETE'])
 def delete_venue(venue_id):
-    # TODO: Complete this endpoint for taking a venue_id, and using
+    # done: Complete this endpoint for taking a venue_id, and using
     # SQLAlchemy ORM to delete a record. Handle cases where the session commit could fail.
 
     # BONUS CHALLENGE: Implement a button to delete a Venue on a Venue Page, have it so that
@@ -321,7 +324,7 @@ def artists():
 
 @app.route('/artists/search', methods=['POST'])
 def search_artists():
-    # TODO: implement search on artists with partial string search. Ensure it is case-insensitive.
+    # done: implement search on artists with partial string search. Ensure it is case-insensitive.
     # seach for "A" should return "Guns N Petals", "Matt Quevado", and "The Wild Sax Band".
     # search for "band" should return "The Wild Sax Band".
     response = {
@@ -346,7 +349,7 @@ def search_artists():
 @app.route('/artists/<int:artist_id>')
 def show_artist(artist_id):
     # shows the venue page with the given venue_id
-    # TODO: replace with real venue data from the venues table, using venue_id
+    # done: replace with real venue data from the venues table, using venue_id
     data1 = {
         "id": 4,
         "name": "Guns N Petals",
@@ -418,10 +421,11 @@ def show_artist(artist_id):
         "past_shows_count": 0,
         "upcoming_shows_count": 3,
     }
-    data = list(filter(lambda d: d['id'] ==
-                       artist_id, [data1, data2, data3]))[0]
+    data = db.session.query(Artist).filter_by(id=artist_id).first()
+    # data = list(filter(lambda d: d['id'] ==
+    #                    artist_id, [data1, data2, data3]))[0]
     return render_template('pages/show_artist.html', artist=data)
-
+    
 #  Update
 #  ----------------------------------------------------------------
 @app.route('/artists/<int:artist_id>/edit', methods=['GET'])
@@ -509,7 +513,7 @@ def create_artist_submission():
 
         db.session.add(artist)
         db.session.commit()
-        # TODO: modify data to be the data object returned from db insertion
+        # done: modify data to be the data object returned from db insertion
         # on successful db insert, flash success
         flash('Artist ' + name + ' was successfully listed!')
     except:
